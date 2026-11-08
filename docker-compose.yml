@@ -1,0 +1,65 @@
+# One command: `docker compose up --build`
+#   Web app     http://localhost:5173
+#   API         http://localhost:3000
+#   Mailpit UI  http://localhost:8025  (the "sales inbox")
+#
+# Works with no setup. To override anything, copy .env.example to .env (gitignored).
+# Secrets (SMTP_USER/SMTP_PASS) only ever come from the environment.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_REQUIRE_TLS: ${SMTP_REQUIRE_TLS:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SALES_INBOX: ${SALES_INBOX:-sales@example.com}
+      MAIL_FROM: ${MAIL_FROM:-Product Catalogue <no-reply@example.com>}
+      ENQUIRY_RATE_LIMIT_MAX: ${ENQUIRY_RATE_LIMIT_MAX:-5}
+      ENQUIRY_RATE_LIMIT_WINDOW_MS: ${ENQUIRY_RATE_LIMIT_WINDOW_MS:-900000}
+      PRODUCT_CACHE_TTL_MS: ${PRODUCT_CACHE_TTL_MS:-300000}
+      UPSTREAM_TIMEOUT_MS: ${UPSTREAM_TIMEOUT_MS:-5000}
+    depends_on:
+      mailpit:
+        condition: service_started
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+    ports:
+      - '5173:8080'
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports:
+      - '8025:8025'
+    # SMTP (1025) is only reachable from the api container, not published to the host.
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

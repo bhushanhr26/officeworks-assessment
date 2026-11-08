@@ -1,0 +1,13 @@
+.box {
+  padding: var(--space-5);
+  background: var(--color-success-surface);
+  border-left: var(--space-1) solid var(--color-success);
+  border-radius: var(--radius-md);
+  max-width: var(--form-max-width);
+}
+
+.links {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: 0;
+}
