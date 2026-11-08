@@ -1,0 +1,10 @@
+# Keep the build context small, and never ship local secrets or build output into images.
+.git
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*
+!**/.env.example
+docs
+*.md

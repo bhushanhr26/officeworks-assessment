@@ -1,0 +1,39 @@
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--detail-column-min-width), 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.image {
+  width: 100%;
+  max-height: var(--detail-image-max-height);
+  object-fit: contain;
+  padding: var(--space-4);
+  background: var(--color-surface-raised);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.category {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.price {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.rating {
+  margin: 0 0 var(--space-3);
+  color: var(--color-rating);
+  font-size: var(--font-size-sm);
+}
